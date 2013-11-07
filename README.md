@@ -1,6 +1,7 @@
 # Emphloyer-PDO
 
-This extension provides a PDO backend for Emphloyer. This extension has only
+This extension provides a PDO backend for
+[Emphloyer](https://github.com/mkremer/emphloyer). This extension has only
 been tested with MySQL but likely works with other SQL databases as well.
 
 ## Installation
