@@ -23,6 +23,21 @@ $pipelineBackend = new
 "user", "password");
 ```
 
+You also need to create the emphloyer_jobs table, in a MySQL database you would
+create the table like so:
+
+```sql
+CREATE table emphloyer_jobs (
+   uuid VARCHAR(36) PRIMARY KEY, 
+   created_at TIMESTAMP, 
+   locked_at TIMESTAMP, 
+   lock_uuid VARCHAR(36) UNIQUE, 
+   status VARCHAR(20), 
+   class_name VARCHAR(255), 
+   attributes TEXT
+);
+```
+
 ## Contributing
 
 1. Fork it

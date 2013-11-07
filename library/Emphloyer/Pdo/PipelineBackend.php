@@ -60,8 +60,8 @@ class PipelineBackend implements \Emphloyer\Pipeline\Backend {
    */
   public function dequeue() {
     $lock = uuid_create();
-    $updateStatement = $this->pdo->prepare("UPDATE emphloyer_jobs SET lock_uuid = ?, status = 'locked' WHERE status = 'free' ORDER BY created_at ASC LIMIT 1");
-    if ($updateStatement->execute(array($lock))) {
+    $updateStatement = $this->pdo->prepare("UPDATE emphloyer_jobs SET lock_uuid = ?, status = 'locked', locked_at = ? WHERE status = 'free' ORDER BY created_at ASC LIMIT 1");
+    if ($updateStatement->execute(array($lock, strftime('%F %T')))) {
       $selectStatement = $this->pdo->prepare("SELECT * FROM emphloyer_jobs WHERE status = 'locked' AND lock_uuid = ?");
       if ($selectStatement->execute(array($lock))) {
         return $this->load($selectStatement->fetch(PDO::FETCH_ASSOC));
