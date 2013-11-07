@@ -9,6 +9,9 @@ You can install Emphloyer-PDO through composer with:
 
     composer require mkrmr/employer-pdo
 
+To use Employer-PDO you need to install the [UUID pecl
+extension](http://pecl.php.net/package/uuid).
+
 ## Usage
 
 To use the PDO extension specify it as the backend in your configuration file
