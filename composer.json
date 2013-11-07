@@ -1,0 +1,24 @@
+{
+    "name": "mkrmr/emphloyer-pdo",
+    "description": "PDO backend for Emphloyer",
+    "require-dev": {
+        "ext-pdo_mysql": "*",
+        "phpunit/phpunit": "3.7.*"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mark Kremer",
+            "email": "mark@5ec.nl"
+        }
+    ],
+    "require": {
+        "mkrmr/emphloyer": "0.1.*",
+        "lib-uuid": "1.0.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Emphloyer\\Pdo\\": "library"
+        }
+    }
+}
