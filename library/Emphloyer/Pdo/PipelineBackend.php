@@ -106,8 +106,11 @@ class PipelineBackend implements \Emphloyer\Pipeline\Backend {
    */
   public function reset($attributes) {
     if (isset($attributes['id'])) {
-      $stmt = $this->pdo->prepare("UPDATE emphloyer_jobs SET status = 'free', lock_uuid = NULL WHERE uuid = ?");
-      $stmt->execute(array($attributes['id']));
+      $id = $attributes['id'];
+      unset($attributes['className']);
+      unset($attributes['id']);
+      $stmt = $this->pdo->prepare("UPDATE emphloyer_jobs SET status = 'free', lock_uuid = NULL, locked_at = NULL, attributes = ? WHERE uuid = ?");
+      $stmt->execute(array(base64_encode(serialize($attributes)), $id));
     }
   }
 
@@ -117,10 +120,14 @@ class PipelineBackend implements \Emphloyer\Pipeline\Backend {
    */
   public function fail($attributes) {
     if (isset($attributes['id'])) {
-      $stmt = $this->pdo->prepare("UPDATE emphloyer_jobs SET status = 'failed' WHERE uuid = ?");
-      $stmt->execute(array($attributes['id']));
+      $id = $attributes['id'];
+      unset($attributes['className']);
+      unset($attributes['id']);
+      $stmt = $this->pdo->prepare("UPDATE emphloyer_jobs SET status = 'failed', attributes = ? WHERE uuid = ?");
+      $stmt->execute(array(base64_encode(serialize($attributes)), $id));
     }
   } 
+
   /**
    * Convert a database record into a set of attributes that can be used to load a Job object.
    * @param array $record

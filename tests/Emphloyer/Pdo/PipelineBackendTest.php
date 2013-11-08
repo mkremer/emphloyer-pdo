@@ -156,10 +156,12 @@ class PipelineBackendTest extends \PHPUnit_Framework_TestCase {
     $this->assertEquals($savedJob->getId(), $job->getId());
     $this->assertNotNull($this->pipeline->find($savedJob->getId()));
 
+    $job->setName('Failed Job 1');
     $this->pipeline->fail($job);
     $job = $this->pipeline->find($savedJob->getId());
     $this->assertNotNull($job);
     $this->assertEquals('failed', $job->getStatus());
+    $this->assertEquals('Failed Job 1', $job->getName());
     $this->assertNull($this->pipeline->dequeue());
   }
 
@@ -174,9 +176,13 @@ class PipelineBackendTest extends \PHPUnit_Framework_TestCase {
     $this->assertNotNull($this->pipeline->find($savedJob->getId()));
 
     $this->pipeline->fail($job);
-    $this->assertEquals('failed', $this->pipeline->find($job->getId())->getStatus());
+    $job = $this->pipeline->find($job->getId());
+    $this->assertEquals('failed', $job->getStatus());
+    $job->setName('Reset Job 1');
     $this->pipeline->reset($job);
-    $this->assertEquals('free', $this->pipeline->find($job->getId())->getStatus());
+    $job = $this->pipeline->find($job->getId());
+    $this->assertEquals('free', $job->getStatus());
+    $this->assertEquals('Reset Job 1', $job->getName());
 
     $job = $this->pipeline->dequeue();
     $this->assertEquals($savedJob->getId(), $job->getId());
