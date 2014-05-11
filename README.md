@@ -35,6 +35,7 @@ CREATE table emphloyer_jobs (
    lock_uuid VARCHAR(36) UNIQUE, 
    status VARCHAR(20), 
    class_name VARCHAR(255), 
+   type VARCHAR(100),
    attributes TEXT
 );
 ```
