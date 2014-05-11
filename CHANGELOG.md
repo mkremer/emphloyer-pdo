@@ -1,3 +1,7 @@
+## 0.3.0 (May 14, 2014)
+
+  - Updates to work with Emphloyer 0.3.0, including Scheduler functionality
+
 ## 0.2.0 (May 11, 2014)
 
   - Updates to work with Emphloyer 0.2.0

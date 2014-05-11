@@ -42,16 +42,21 @@ class PipelineBackend implements \Emphloyer\Pipeline\Backend {
   /**
    * Push a job onto the pipeline.
    * @param array $attributes Job attributes to save (must include the class name as 'className'
+   * @param \DateTime|null $notBefore Date and time after which this job may be run
    * @return array $attributes Updated job attributes, the Pipeline will instantiate a new job instance with these updated attributes (this can be useful to pass a job id or some other attribute of importance back to the caller of this method).
    */
-  public function enqueue($attributes) {
+  public function enqueue($attributes, \DateTime $notBefore = null) {
     $uuid = uuid_create();
     $className = $attributes['className'];
     $type = $attributes['type'];
     unset($attributes['className']);
     unset($attributes['type']);
-    $stmt = $this->pdo->prepare('INSERT INTO emphloyer_jobs (uuid, created_at, status, class_name, type, attributes) VALUES (?, ?, ?, ?, ?, ?)');
-    if ($stmt->execute(array($uuid, strftime('%F %T'), 'free', $className, $type, base64_encode(serialize($attributes))))) {
+    $notBeforeStamp = null;
+    if (!is_null($notBefore)) {
+      $notBeforeStamp = $notBefore->format("Y-m-d H:i:s");
+    }
+    $stmt = $this->pdo->prepare('INSERT INTO emphloyer_jobs (uuid, created_at, run_from, status, class_name, type, attributes) VALUES (?, ?, ?, ?, ?, ?, ?)');
+    if ($stmt->execute(array($uuid, strftime('%F %T'), $notBeforeStamp, 'free', $className, $type, base64_encode(serialize($attributes))))) {
       return $this->find($uuid);
     }
   }
@@ -83,7 +88,7 @@ class PipelineBackend implements \Emphloyer\Pipeline\Backend {
       $andSql = "";
     }
 
-    $updateStatement = $this->pdo->prepare("UPDATE emphloyer_jobs SET lock_uuid = :lock_uuid, status = 'locked', locked_at = :locked_at WHERE status = 'free' {$andSql} ORDER BY created_at ASC LIMIT 1");
+    $updateStatement = $this->pdo->prepare("UPDATE emphloyer_jobs SET lock_uuid = :lock_uuid, status = 'locked', locked_at = :locked_at WHERE status = 'free' AND (run_from IS NULL OR run_from <= NOW()) {$andSql} ORDER BY created_at ASC LIMIT 1");
     if ($updateStatement->execute($params)) {
       $selectStatement = $this->pdo->prepare("SELECT * FROM emphloyer_jobs WHERE status = 'locked' AND lock_uuid = :lock_uuid");
       if ($selectStatement->execute(array('lock_uuid' => $lock))) {
