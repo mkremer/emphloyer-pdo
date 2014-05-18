@@ -89,7 +89,8 @@ class SchedulerBackend implements \Emphloyer\Scheduler\Backend {
 
         if ($selectStatement->execute(array('lock_uuid' => $lockUuid))) {
           while ($row = $selectStatement->fetch(PDO::FETCH_ASSOC)) {
-            $jobs[] = $this->load($row);
+            $entry = $this->load($row);
+            $jobs[] = $entry["job"];
           }
         }
       }
@@ -105,7 +106,8 @@ class SchedulerBackend implements \Emphloyer\Scheduler\Backend {
       );
       if ($selectStatement->execute($params)) {
         while ($row = $selectStatement->fetch(PDO::FETCH_ASSOC)) {
-          $jobs[] = $this->load($row);
+          $entry = $this->load($row);
+          $jobs[] = $entry["job"];
         }
       }
     }
@@ -118,11 +120,32 @@ class SchedulerBackend implements \Emphloyer\Scheduler\Backend {
    * @param mixed $id
    * @return array|null
    */
-  protected function find($id) {
+  public function find($id) {
     $stmt = $this->pdo->prepare('SELECT * FROM emphloyer_scheduled_jobs WHERE uuid = ?');
     if ($stmt->execute(array($id))) {
-      return $this->load($stmt->fetch(PDO::FETCH_ASSOC));
+      if ($record = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        return $this->load($record);
+      }
     }
+  }
+
+  /**
+   * Delete a specific entry in the schedule using its id and return its attributes.
+   * @param mixed $id
+   * @return array|null
+   */
+  public function delete($id) {
+    $stmt = $this->pdo->prepare('DELETE FROM emphloyer_scheduled_jobs WHERE uuid = ?');
+    $stmt->execute(array($id));
+  }
+
+  /**
+   * Get all entries in the schedule
+   */
+  public function allEntries() {
+    $stmt = $this->pdo->prepare("SELECT * FROM emphloyer_scheduled_jobs ORDER BY id ASC;");
+    $stmt->execute();
+    return new ScheduleEntryIterator($stmt);
   }
 
   /**
@@ -131,9 +154,18 @@ class SchedulerBackend implements \Emphloyer\Scheduler\Backend {
    * @return array
    */
   protected function load($record) {
-    $attributes = unserialize(base64_decode($record['attributes']));
-    $attributes['id'] = $record['uuid'];
-    $attributes['className'] = $record['class_name'];
+    $jobAttributes = unserialize(base64_decode($record['attributes']));
+    $jobAttributes['id'] = $record['uuid'];
+    $jobAttributes['className'] = $record['class_name'];
+    $attributes = array(
+      'id' => $record['uuid'],
+      'job' => $jobAttributes,
+      'minute' => $record['minute'],
+      'hour' => $record['hour'],
+      'dayOfMonth' => $record['monthday'],
+      'month' => $record['month'],
+      'dayOfWeek' => $record['weekday'],
+    );
     return $attributes;
   }
 }

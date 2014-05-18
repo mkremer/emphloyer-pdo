@@ -13,7 +13,7 @@
         }
     ],
     "require": {
-        "mkrmr/emphloyer": "0.3.*",
+        "mkrmr/emphloyer": "0.4.*",
         "lib-uuid": "1.0.*"
     },
     "autoload": {
