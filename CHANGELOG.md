@@ -1,3 +1,8 @@
+## Unreleased
+
+  - Switch to the Hashicorp Ubuntu 12.04 Vagrant box (due to composer issues
+    with the official box).
+
 ## 0.4.1 (September 28, 2014)
 
   - Allow setting table names so you can run multiple backends on the same
