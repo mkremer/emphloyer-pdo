@@ -13,6 +13,7 @@ class PipelineBackend implements \Emphloyer\Pipeline\Backend {
   protected $pdoPassword;
   protected $pdoAttributes;
   protected $pdo;
+  protected $tableName;
 
   /**
    * Instantiate a new PipelineBackend.
@@ -22,12 +23,30 @@ class PipelineBackend implements \Emphloyer\Pipeline\Backend {
    * @param array $attributes PDO driver attributes
    * @return PipelineBackend
    */
-  public function __construct($dsn, $user = null, $password = null, $attributes = array()) {
+  public function __construct($dsn, $user = null, $password = null, $attributes = array(), $tableName = "emphloyer_jobs") {
     $this->pdoDsn = $dsn;
     $this->pdoUser = $user;
     $this->pdoPassword = $password;
     $this->pdoAttributes = $attributes;
+    $this->tableName = $tableName;
     $this->reconnect();
+  }
+
+  /**
+   * Get the database table name.
+   * @return string
+   */
+  public function getTableName() {
+    return $this->tableName;
+  }
+
+  /**
+   * Set the database table name to use.
+   * @param string $tableName
+   * @return PipelineBackend
+   */
+  public function setTableName($tableName) {
+    $this->tableName = $tableName;
   }
 
   /**
@@ -55,7 +74,7 @@ class PipelineBackend implements \Emphloyer\Pipeline\Backend {
     if (!is_null($notBefore)) {
       $notBeforeStamp = $notBefore->format("Y-m-d H:i:s");
     }
-    $stmt = $this->pdo->prepare('INSERT INTO emphloyer_jobs (uuid, created_at, run_from, status, class_name, type, attributes) VALUES (?, ?, ?, ?, ?, ?, ?)');
+    $stmt = $this->pdo->prepare('INSERT INTO ' . $this->tableName . ' (uuid, created_at, run_from, status, class_name, type, attributes) VALUES (?, ?, ?, ?, ?, ?, ?)');
     if ($stmt->execute(array($uuid, strftime('%F %T'), $notBeforeStamp, 'free', $className, $type, base64_encode(serialize($attributes))))) {
       return $this->find($uuid);
     }
@@ -88,9 +107,9 @@ class PipelineBackend implements \Emphloyer\Pipeline\Backend {
       $andSql = "";
     }
 
-    $updateStatement = $this->pdo->prepare("UPDATE emphloyer_jobs SET lock_uuid = :lock_uuid, status = 'locked', locked_at = :locked_at WHERE status = 'free' AND (run_from IS NULL OR run_from <= NOW()) {$andSql} ORDER BY created_at ASC LIMIT 1");
+    $updateStatement = $this->pdo->prepare("UPDATE " . $this->tableName . " SET lock_uuid = :lock_uuid, status = 'locked', locked_at = :locked_at WHERE status = 'free' AND (run_from IS NULL OR run_from <= NOW()) {$andSql} ORDER BY created_at ASC LIMIT 1");
     if ($updateStatement->execute($params)) {
-      $selectStatement = $this->pdo->prepare("SELECT * FROM emphloyer_jobs WHERE status = 'locked' AND lock_uuid = :lock_uuid");
+      $selectStatement = $this->pdo->prepare("SELECT * FROM " . $this->tableName . " WHERE status = 'locked' AND lock_uuid = :lock_uuid");
       if ($selectStatement->execute(array('lock_uuid' => $lock))) {
         return $this->load($selectStatement->fetch(PDO::FETCH_ASSOC));
       }
@@ -103,7 +122,7 @@ class PipelineBackend implements \Emphloyer\Pipeline\Backend {
    * @return array|null
    */
   public function find($id) {
-    $stmt = $this->pdo->prepare('SELECT * FROM emphloyer_jobs WHERE uuid = ?');
+    $stmt = $this->pdo->prepare('SELECT * FROM ' . $this->tableName . ' WHERE uuid = ?');
     if ($stmt->execute(array($id))) {
       return $this->load($stmt->fetch(PDO::FETCH_ASSOC));
     }
@@ -113,7 +132,7 @@ class PipelineBackend implements \Emphloyer\Pipeline\Backend {
    * Delete all the jobs from the pipeline.
    */
   public function clear() {
-    $stmt = $this->pdo->prepare('TRUNCATE emphloyer_jobs');
+    $stmt = $this->pdo->prepare('TRUNCATE ' . $this->tableName);
     $stmt->execute();
   }
 
@@ -123,7 +142,7 @@ class PipelineBackend implements \Emphloyer\Pipeline\Backend {
    */
   public function complete($attributes) {
     if (isset($attributes['id'])) {
-      $stmt = $this->pdo->prepare('DELETE FROM emphloyer_jobs WHERE uuid = ?');
+      $stmt = $this->pdo->prepare('DELETE FROM ' . $this->tableName . ' WHERE uuid = ?');
       $stmt->execute(array($attributes['id']));
     }
   }
@@ -139,7 +158,7 @@ class PipelineBackend implements \Emphloyer\Pipeline\Backend {
       unset($attributes['type']);
       unset($attributes['className']);
       unset($attributes['id']);
-      $stmt = $this->pdo->prepare("UPDATE emphloyer_jobs SET status = 'free', lock_uuid = NULL, locked_at = NULL, type = ?, attributes = ? WHERE uuid = ?");
+      $stmt = $this->pdo->prepare("UPDATE " . $this->tableName . " SET status = 'free', lock_uuid = NULL, locked_at = NULL, type = ?, attributes = ? WHERE uuid = ?");
       $stmt->execute(array($type, base64_encode(serialize($attributes)), $id));
     }
   }
@@ -155,7 +174,7 @@ class PipelineBackend implements \Emphloyer\Pipeline\Backend {
       unset($attributes['type']);
       unset($attributes['className']);
       unset($attributes['id']);
-      $stmt = $this->pdo->prepare("UPDATE emphloyer_jobs SET status = 'failed', type = ?, attributes = ? WHERE uuid = ?");
+      $stmt = $this->pdo->prepare("UPDATE " . $this->tableName . " SET status = 'failed', type = ?, attributes = ? WHERE uuid = ?");
       $stmt->execute(array($type, base64_encode(serialize($attributes)), $id));
     }
   } 
