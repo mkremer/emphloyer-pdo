@@ -1,3 +1,9 @@
+## 0.4.1 (September 28, 2014)
+
+  - Allow setting table names so you can run multiple backends on the same
+    database, but with different database tables
+  - Use the official Ubuntu 12.04 Vagrant box
+
 ## 0.4.0 (May 18, 2014)
 
   - Updates to work with Emphloyer 0.4.0 to support management of Scheduler

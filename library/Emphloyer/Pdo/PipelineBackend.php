@@ -21,6 +21,7 @@ class PipelineBackend implements \Emphloyer\Pipeline\Backend {
    * @param string $user Database user
    * @param string $password Database password
    * @param array $attributes PDO driver attributes
+   * @param string $tableName Database table to use
    * @return PipelineBackend
    */
   public function __construct($dsn, $user = null, $password = null, $attributes = array(), $tableName = "emphloyer_jobs") {

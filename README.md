@@ -4,6 +4,11 @@ This extension provides a PDO backend for
 [Emphloyer](https://github.com/mkremer/emphloyer). This extension has only
 been tested with MySQL but likely works with other SQL databases as well.
 
+NOTE: If you're replicating the MySQL database that holds you jobs table be sure
+to use MIXED or ROW based replication (STATEMENT based replication will generate
+tons of warnings because the backend uses UPDATE queries with a WHERE statement
+to lock jobs).
+
 ## Installation
 
 You can install Emphloyer-PDO through composer with:
@@ -22,8 +27,16 @@ like so:
 $pipelineBackend = new \Emphloyer\Pdo\PipelineBackend("mysql:dbname=emphloyer_example;host=localhost", "user", "password");
 ```
 
-You also need to create the emphloyer\_jobs table, in a MySQL database you would
-create the table like so:
+If you want to use a specific table name for your jobs you can pass it to the
+constructor (emphloyer\_jobs is the default):
+
+```php
+$pdoAttributes = array();
+$pipelineBackend = new \Emphloyer\Pdo\PipelineBackend("mysql:dbname=emphloyer_example;host=localhost", "user", "password", $pdoAttributes, "emphloyer_jobs");
+```
+
+You also need to create the database table, in a MySQL database you would create the table 
+like so:
 
 ```sql
 CREATE table emphloyer_jobs (
@@ -46,8 +59,16 @@ following to the configuration file:
 $schedulerBackend = new \Emphloyer\Pdo\SchedulerBackend("mysql:dbname=emphloyer_example;host=localhost", "user", "password");
 ```
 
-You also need to create the emphloyer\_scheduler\_jobs table, in a MySQL 
-database you would create the table like so:
+If you want to use a specific table name for your jobs you can pass it to the
+constructor (emphloyer\_scheduled\_jobs is the default):
+
+```php
+$pdoAttributes = array();
+$schedulerBackend = new \Emphloyer\Pdo\SchedulerBackend("mysql:dbname=emphloyer_example;host=localhost", "user", "password", $pdoAttributes, "emphloyer_scheduled_jobs");
+```
+
+You also need to create the database table, in a MySQL database you would create 
+the table like so:
 
 ```sql
 CREATE table emphloyer_scheduled_jobs (
