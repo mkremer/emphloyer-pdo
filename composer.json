@@ -3,12 +3,12 @@
     "description": "PDO backend for Emphloyer",
     "require-dev": {
         "ext-pdo_mysql": "*",
-        "phpunit/phpunit": "3.7.*"
+        "phpunit/phpunit": "6.5.*"
     },
     "license": "MIT",
     "authors": [
         {
-            "name": "Mark Kremer",
+            "name": "Mark Cornelissen",
             "email": "mark@5ec.nl"
         }
     ],
