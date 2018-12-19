@@ -1,5 +1,6 @@
-## Unreleased
+## 0.5.0 (December 19, 2018)
 
+  - Updated to work with Emphloyer 0.5.0
   - Switch to the Hashicorp Ubuntu 12.04 Vagrant box (due to composer issues
     with the official box).
 
