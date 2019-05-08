@@ -83,7 +83,7 @@ class SchedulerBackend implements \Emphloyer\Scheduler\Backend
         $month = null,
         $dayOfWeek = null
     ) {
-        $uuid = uuid_create();
+        $uuid = \Ramsey\Uuid\Uuid::uuid4()->toString();
         $className = $job['className'];
         unset($job['className']);
         $stmt = $this->pdo->prepare('INSERT INTO ' . $this->tableName . ' (uuid, created_at, class_name, attributes, minute, hour, monthday, month, weekday) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
@@ -149,7 +149,7 @@ class SchedulerBackend implements \Emphloyer\Scheduler\Backend
         $month = $dateTime->format("m");
         $dayOfWeek = $dateTime->format("w");
 
-        $lockUuid = uuid_create();
+        $lockUuid = \Ramsey\Uuid\Uuid::uuid4()->toString();
         $params = array(
             'lock_uuid' => $lockUuid,
             'locked_at' => $dateTime->format("Y-m-d H:i") . ":00",

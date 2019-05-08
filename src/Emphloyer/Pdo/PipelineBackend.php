@@ -77,7 +77,7 @@ class PipelineBackend implements \Emphloyer\Pipeline\Backend
      */
     public function enqueue($attributes, \DateTime $notBefore = null)
     {
-        $uuid = uuid_create();
+        $uuid = \Ramsey\Uuid\Uuid::uuid4()->toString();
         $className = $attributes['className'];
         $type = $attributes['type'];
         unset($attributes['className']);
@@ -135,7 +135,7 @@ class PipelineBackend implements \Emphloyer\Pipeline\Backend
      */
     public function dequeue(array $options = array())
     {
-        $lock = uuid_create();
+        $lock = \Ramsey\Uuid\Uuid::uuid4()->toString();
         $params = array('lock_uuid' => $lock, 'locked_at' => strftime('%F %T'));
 
         if (isset($options["only"])) {

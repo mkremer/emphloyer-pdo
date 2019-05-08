@@ -3,7 +3,8 @@
     "description": "PDO backend for Emphloyer",
     "require-dev": {
         "ext-pdo_mysql": "*",
-        "phpunit/phpunit": "6.5.*"
+        "phpunit/phpunit": "^8",
+        "doctrine/coding-standard": "^6.0"
     },
     "license": "MIT",
     "authors": [
@@ -13,12 +14,12 @@
         }
     ],
     "require": {
-        "mkrmr/emphloyer": "0.5.*",
-        "lib-uuid": "1.0.*"
+        "mkrmr/emphloyer": "0.6.*",
+        "ramsey/uuid": "^3.8"
     },
     "autoload": {
         "psr-0": {
-            "Emphloyer\\Pdo\\": "library"
+            "Emphloyer\\Pdo\\": "src"
         }
     }
 }
