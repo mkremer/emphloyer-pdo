@@ -1,3 +1,18 @@
+## 0.6.0 (May 9, 2019)
+   
+  - Vagrant configuration updated to use bento/ubuntu-18.04 box with PHP 7.2
+    If you are developing Emphloyer-PDO with the including configuration you will 
+    need to: vagrant destroy && vagrant up
+  - Updated to PHPUnit 8  
+  - Added the Doctrine coding standard as a development dependency. You can now 
+    use phpcs and phpcbf using the included configuration.
+    Updated a large portion of the source to adhere to the Doctrine coding 
+    standard
+    This includes the following BC breaks:
+    - More strict use of types
+    - Internal exceptions have been renamed
+  - Moved the source from library to src
+  
 ## 0.5.0 (December 19, 2018)
 
   - Updated to work with Emphloyer 0.5.0
