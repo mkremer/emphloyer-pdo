@@ -1,36 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emphloyer\Pdo;
 
-class ScheduleEntryIterator extends \IteratorIterator
+use IteratorIterator;
+use function base64_decode;
+use function unserialize;
+
+class ScheduleEntryIterator extends IteratorIterator
 {
     /**
-     * @param \Traversable $source
-     */
-    public function __construct(\Traversable $source)
-    {
-        parent::__construct($source);
-    }
-
-    /**
      * Convert an array with schedule entry attributes into an object
-     * @return \Emphloyer\Scheduler\ScheduleEntry
+     *
+     * @return mixed[]
      */
-    public function current()
+    public function current() : array
     {
-        $record = parent::current();
-        $jobAttributes = unserialize(base64_decode($record['attributes']));
-        $jobAttributes['id'] = $record['uuid'];
+        $record                     = parent::current();
+        $jobAttributes              = unserialize(base64_decode($record['attributes']));
+        $jobAttributes['id']        = $record['uuid'];
         $jobAttributes['className'] = $record['class_name'];
-        $attributes = array(
+
+        return [
             'id' => $record['uuid'],
             'job' => $jobAttributes,
-            'minute' => $record['minute'],
-            'hour' => $record['hour'],
-            'dayOfMonth' => $record['monthday'],
-            'month' => $record['month'],
-            'dayOfWeek' => $record['weekday'],
-        );
-        return $attributes;
+            'minute' => $record['minute'] ? (int) $record['minute'] : null,
+            'hour' => $record['hour'] ? (int) $record['hour'] : null,
+            'dayOfMonth' => $record['monthday'] ? (int) $record['monthday'] : null,
+            'month' => $record['month'] ? (int) $record['month'] : null,
+            'dayOfWeek' => $record['weekday'] ? (int) $record['weekday'] : null,
+        ];
     }
 }
