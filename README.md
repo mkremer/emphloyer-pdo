@@ -31,7 +31,7 @@ If you want to use a specific table name for your jobs you can pass it to the
 constructor (emphloyer\_jobs is the default):
 
 ```php
-$pdoAttributes = array();
+$pdoAttributes = [];
 $pipelineBackend = new \Emphloyer\Pdo\PipelineBackend("mysql:dbname=emphloyer_example;host=localhost", "user", "password", $pdoAttributes, "emphloyer_jobs");
 ```
 
@@ -63,7 +63,7 @@ If you want to use a specific table name for your jobs you can pass it to the
 constructor (emphloyer\_scheduled\_jobs is the default):
 
 ```php
-$pdoAttributes = array();
+$pdoAttributes = [];
 $schedulerBackend = new \Emphloyer\Pdo\SchedulerBackend("mysql:dbname=emphloyer_example;host=localhost", "user", "password", $pdoAttributes, "emphloyer_scheduled_jobs");
 ```
 
@@ -92,7 +92,7 @@ CREATE table emphloyer_scheduled_jobs (
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
-
+3. Make your changes, please make sure you adhere to the Doctrine coding standard as much as possible (phpcs configuration is included)
+4. Commit your changes (`git commit -am 'Add some feature'`)
+5. Push to the branch (`git push origin my-new-feature`)
+6. Create a new pull request on GitHub
